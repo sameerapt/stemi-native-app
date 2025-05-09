@@ -1,5 +1,6 @@
-import { FlatList, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { FlatList, View, Text, StyleSheet, TouchableOpacity, Image, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import CommonHeader from '../components/CommonHeader';
 
 interface Item {
   name: string;
@@ -13,7 +14,7 @@ interface Item {
   hasLocation?: boolean;
 }
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const alarmItems: Item[] = [
     {
       name: 'Mathew Pope',
@@ -80,8 +81,8 @@ const HomeScreen = () => {
       <View style={styles.headerContainer}>
         <Text style={styles.name}>{item.name}</Text>
         <View style={styles.iconContainer}>
-          {item.hasEye && <View style={styles.icon}><Ionicons name="eye" size={18} color="#2196F3" /></View>}
-          {item.hasMessage && <View style={styles.icon}><Ionicons name="chatbubble-ellipses" size={18} color="#2196F3" /></View>}
+          {item.hasEye && <View style={styles.icon}><Ionicons name="eye" size={18} color="#1A719F" /></View>}
+          {item.hasMessage && <View style={styles.icon}><Ionicons name="chatbubble-ellipses" size={18} color="#1A719F" /></View>}
         </View>
       </View>
       
@@ -100,7 +101,7 @@ const HomeScreen = () => {
         <Text style={styles.detailValue}>{item.facility}</Text>
         {item.hasLocation && 
           <View style={styles.locationIcon}>
-            <Ionicons name="location" size={16} color="#2196F3" />
+            <Ionicons name="location" size={16} color="#1A719F" />
           </View>
         }
       </View>
@@ -115,28 +116,31 @@ const HomeScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Alarms</Text>
-        <TouchableOpacity>
-          <Ionicons name="notifications" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <CommonHeader navigation={navigation} title="Alarms" />
 
       <FlatList
         data={alarmItems}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.listContainer}
+        // Add padding at the bottom to make room for the button
+        contentInset={{ bottom: 90 }}
+        contentInsetAdjustmentBehavior="automatic"
+        ListFooterComponent={<View style={{ height: 90 }} />}
       />
 
-      <TouchableOpacity style={styles.fab}>
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={() => navigation.navigate('PatientDetails')}
+      >
         <Image 
           source={require('../assets/Raise-Stemi-Alarm.png')} 
           style={styles.fabImage}
         />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -163,6 +167,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 16,
+    paddingBottom: 90, // Additional padding to ensure content doesn't hide behind the button
   },
   itemContainer: {
     backgroundColor: '#FFFFFF',
@@ -257,23 +262,16 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 70,
+    bottom: 20, // Moved up from 70 to make it more visible
     right: 16,
-    backgroundColor: '#2196F3',
     borderRadius: 30,
-    width: 60,
-    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    zIndex: 100, // Ensure it appears above other elements
   },
   fabImage: {
-    width: 40,
-    height: 40,
+    width: 110,
+    height: 110,
   }
 });
 
